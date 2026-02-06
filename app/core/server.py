@@ -1,35 +1,59 @@
-# HTTP сервер
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from app.config import HOST, PORT
+from app.core.routes import route
+import json
 
-# Функция обработчика ответов
-class MyHandler(BaseHTTPRequestHandler):
-    def do_get(self):
-        self.send_response(200)
-        path = self.path
+# Базовый обработчик запросов
+class Handler(BaseHTTPRequestHandler):
 
-        response = f"<h1>404: Page {path} not found</h1>".encode('utf-8')
-        if path == "/login":
-            response = b"<h1>Profile page</h1>"
-        elif path == "/Tasks":
-            response = b"<h1>"
-        self.send_header("Content-type", "text/html; charset=utf-8")
-        self.end_headers()
+    def do_GET(self):
+        self.handle_request()
 
-        self.wfile.write("HELLO".encode('utf-8'))
+    def do_POST(self):
+        self.handle_request()
+    
+    def do_PUT(self):
+        self.handle_request()
+    
+    def do_DELETE(self):
+        self.handle_request()
 
-# Создание порта и название сервера
-hostname = "localhost"
-server_port = 8000
+    def handle_request(self):
+        try:
+            result = route.resolve(self) 
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
 
-# Создание самого сервера
-web_server = HTTPServer((hostname, server_port), MyHandler)
-print(f"Сервер запущен: http://{hostname}:{server_port}")
+            if result:
+                self.wfile.write(json.dumps(result).encode())
+        
+        except PermissionError as e:
+            self.send_response(403)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(str(e).encode())
 
-# Работа самого сервера
-try:
-    web_server.serve_forever()
-except KeyboardInterrupt: # Прекращение при нажатии Ctrl + C
-    print("Работа сервера прервана клавишами")
+        except ValueError as e:
+            self.send_response(400)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(str(e).encode())
 
-web_server.server_close()
-print("Сервер остановлен...")
+        except Exception as e:
+            self.send_response(500)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(str(e).encode())
+
+# Функция для запуска сервера
+def run():
+    Server = HTTPServer((HOST, PORT), Handler) # <-- Сам сервер
+    print(f"Сервер запущен на http://{HOST}:{PORT}")
+
+    try:
+        Server.serve_forever()
+    except KeyboardInterrupt:
+        print("Сервер остановлен") # <-- Остановка комбинацией Ctrl + C
+    finally:
+        Server.server_close()

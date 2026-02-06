@@ -7,7 +7,7 @@ class Role(Enum):
 
 # Класс сущности User
 class User:
-    def __init__(self, id: int, name:str, password: str, role: Role):
+    def __init__(self, id: int, name:str, role: Role, password: str | None = None):
         self.id = id
         self.name = name
         self.password = password

@@ -1,5 +1,5 @@
 import sqlite3
-from config import DB_PATH
+from app.config import DB_PATH
 
 # Функция для создания подключения к нашей БД
 def connection_to_db():

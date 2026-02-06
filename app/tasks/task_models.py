@@ -1,5 +1,3 @@
-# Классы моделей (бизнес-логика, структуры данных)
-
 # Класс сущности Task
 class Task:
     def __init__(self, id: int, title: str, description: str, is_completed: bool, assigned_to: int):

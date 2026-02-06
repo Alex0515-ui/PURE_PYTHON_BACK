@@ -1,5 +1,4 @@
-from .connection import connection_to_db
-import sqlite3
+from app.db.connection import connection_to_db
 
 # Функция для создания таблиц БД
 def create_tables():
@@ -26,7 +25,17 @@ def create_tables():
         is_completed BOOLEAN DEFAULT 0,     
         assigned_to INTEGER NOT NULL,
         FOREIGN KEY (assigned_to) REFERENCES users (id)
-                   )
+        )
+''')
+    # Таблица сессий
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS sessions (
+        session_id TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        created_at TIMESTAMP NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id)         
+    )
 ''')
     
     connection.commit() # Сохраняем все
