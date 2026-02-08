@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  server:
+    build: .
+    container_name: pure_python_app
+    ports: 
+      - "8000:8000"
+    volumes:
+      - .:/backend
+    environment:
+      - PYTHONUNBUFFERED=1
